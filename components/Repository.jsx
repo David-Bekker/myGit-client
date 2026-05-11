@@ -13,10 +13,10 @@ const languageColors = {
   CSS: "#563d7c",
 };
 
-export function Repository() {
+export default function Repository() {
   const params = useParams();
-  // Ensure we capture owner and repo regardless of folder naming
-  const owner = params.owner;
+  // Ensure we capture username and repo regardless of folder naming
+  const username = params.username;
   const repo = params.repo;
 
   const repoData = {
@@ -47,8 +47,8 @@ export function Repository() {
           <div>
             <h1 className="flex items-center gap-2 text-xl">
               {/* FIXED: Changed 'to' to 'href' */}
-              <Link href={`/${owner}`} className="text-[#539bf5] hover:underline">
-                {owner}
+              <Link href={`/${username}`} className="text-[#539bf5] hover:underline">
+                {username}
               </Link>
               <span className="text-[#7d8590]">/</span>
               <span className="text-[#539bf5] font-semibold">{repo}</span>
@@ -75,14 +75,14 @@ export function Repository() {
         <div className="border-b border-[#30363d]">
           <nav className="flex gap-4 text-sm">
             <Link
-              href={`/${owner}/${repo}`}
+              href={`/${username}/${repo}`}
               className="px-4 py-3 border-b-2 border-[#fd8c73] flex items-center gap-2"
             >
               <Code className="w-4 h-4" />
               Code
             </Link>
             <Link
-              href={`/${owner}/${repo}/issues`}
+              href={`/${username}/${repo}/issues`}
               className="px-4 py-3 text-[#7d8590] hover:text-[#e6edf3] flex items-center gap-2"
             >
               <AlertCircle className="w-4 h-4" />
@@ -106,7 +106,7 @@ export function Repository() {
           {files.map((file) => (
             <Link
               key={file.name}
-              href={file.type === "folder" ? `/${owner}/${repo}/tree/main/${file.name}` : "#"}
+              href={file.type === "folder" ? `/${username}/${repo}/tree/main/${file.name}` : "#"}
               className="flex items-center gap-3 px-4 py-2 hover:bg-[#161b22] group"
             >
               {file.type === "folder" ? "📁" : "📄"}

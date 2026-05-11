@@ -52,7 +52,7 @@ const languageColors = {
 };
 
 // 2. ONLY ONE export function Profile()
-export function Profile() {
+export default function Profile() {
   const params = useParams();
   const username = params.username || params.owner;
   const [mounted, setMounted] = useState(false);

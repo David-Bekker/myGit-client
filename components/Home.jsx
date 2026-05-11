@@ -1,9 +1,11 @@
-import { Link } from "react-router";
+"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Star, GitFork, Circle } from "lucide-react";
 
 const repositories = [
   {
-    owner: "facebook",
+    username: "facebook",
     name: "react",
     description: "The library for web and native user interfaces",
     language: "JavaScript",
@@ -12,7 +14,7 @@ const repositories = [
     isPublic: true,
   },
   {
-    owner: "microsoft",
+    username: "microsoft",
     name: "vscode",
     description: "Visual Studio Code",
     language: "TypeScript",
@@ -21,7 +23,7 @@ const repositories = [
     isPublic: true,
   },
   {
-    owner: "vercel",
+    username: "vercel",
     name: "next.js",
     description: "The React Framework",
     language: "JavaScript",
@@ -30,7 +32,7 @@ const repositories = [
     isPublic: true,
   },
   {
-    owner: "tailwindlabs",
+    username: "tailwindlabs",
     name: "tailwindcss",
     description: "A utility-first CSS framework for rapid UI development",
     language: "CSS",
@@ -40,7 +42,7 @@ const repositories = [
   },
 ];
 
-const languageColors:  = {
+const languageColors = {
   JavaScript: "#f1e05a",
   TypeScript: "#3178c6",
   Python: "#3572A5",
@@ -60,11 +62,11 @@ export function Home() {
               <div className="space-y-2">
                 {repositories.slice(0, 3).map((repo) => (
                   <Link
-                    key={`${repo.owner}/${repo.name}`}
-                    to={`/${repo.owner}/${repo.name}`}
+                    key={`${repo.username}/${repo.name}`}
+                    href={`/${repo.username}/${repo.name}`}
                     className="block text-sm text-[#539bf5] hover:underline"
                   >
-                    {repo.owner}/{repo.name}
+                    {repo.username}/{repo.name}
                   </Link>
                 ))}
               </div>
@@ -79,16 +81,16 @@ export function Home() {
           <div className="space-y-4">
             {repositories.map((repo) => (
               <div
-                key={`${repo.owner}/${repo.name}`}
+                key={`${repo.username}/${repo.name}`}
                 className="border border-[#30363d] rounded-md p-4 hover:border-[#3d444d] transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <Link
-                      to={`/${repo.owner}/${repo.name}`}
+                      href={`/${repo.username}/${repo.name}`}
                       className="text-[#539bf5] hover:underline inline-flex items-center gap-2"
                     >
-                      <span className="font-semibold">{repo.owner}/{repo.name}</span>
+                      <span className="font-semibold">{repo.username}/{repo.name}</span>
                       <span className="text-xs border border-[#30363d] rounded-full px-2 py-0.5 text-[#7d8590]">
                         Public
                       </span>
