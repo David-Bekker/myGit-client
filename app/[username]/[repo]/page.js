@@ -7,7 +7,6 @@ export default async function RepoPage({ params }) {
     <main>
       {/* This component will now know exactly which repo to show */}
       <Repository username={username} repoName={repo} />
-      <code />
     </main>
   );
 }

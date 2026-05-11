@@ -19,15 +19,15 @@ root.render(
   </React.StrictMode>
 );`;
 
-export function Code() {
+export default function Code() {
   const params = useParams();
 
   /**
    * FALLBACK LOGIC:
    * Next.js throws a 500 error if any part of a Link's href is undefined.
-   * We extract owner and repo, and default the branch to 'main' if it's missing from the URL.
+   * We extract username and repo, and default the branch to 'main' if it's missing from the URL.
    */
-  const owner = params.owner || "";
+  const username = params.username || "";
   const repo = params.repo || "";
   const branch = params.branch || "main";
 
@@ -45,16 +45,16 @@ export function Code() {
       <div className="mb-4">
         <div className="flex items-center gap-2 text-sm text-[#7d8590]">
           <Link 
-            href={`/${owner}`} 
+            href={`/${username}`} 
             className="text-[#539bf5] hover:underline"
           >
-            {owner}
+            {username}
           </Link>
           
           <ChevronRight className="w-4 h-4" />
           
           <Link 
-            href={`/${owner}/${repo}`} 
+            href={`/${username}/${repo}`} 
             className="text-[#539bf5] hover:underline"
           >
             {repo}
@@ -64,7 +64,7 @@ export function Code() {
             <React.Fragment key={index}>
               <ChevronRight className="w-4 h-4" />
               <Link
-                href={`/${owner}/${repo}/tree/${branch}/${pathParts.slice(0, index + 1).join("/")}`}
+                href={`/${username}/${repo}/tree/${branch}/${pathParts.slice(0, index + 1).join("/")}`}
                 className="text-[#539bf5] hover:underline"
               >
                 {part}

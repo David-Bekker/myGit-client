@@ -1,4 +1,7 @@
-import { Link, useParams } from "react-router";
+"use client";
+import { useState } from "react";
+import Link from "next/link"; // Use next/link
+import { Link, useParams } from "next/navigation";
 import { ChevronRight, AlertTriangle, Trash2 } from "lucide-react";
 
 export function RepositorySettings() {
