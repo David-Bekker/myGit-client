@@ -1,46 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Star, GitFork, Circle } from "lucide-react";
-
-const repositories = [
-  {
-    username: "facebook",
-    name: "react",
-    description: "The library for web and native user interfaces",
-    language: "JavaScript",
-    stars: 228000,
-    forks: 46700,
-    isPublic: true,
-  },
-  {
-    username: "microsoft",
-    name: "vscode",
-    description: "Visual Studio Code",
-    language: "TypeScript",
-    stars: 163000,
-    forks: 28900,
-    isPublic: true,
-  },
-  {
-    username: "vercel",
-    name: "next.js",
-    description: "The React Framework",
-    language: "JavaScript",
-    stars: 125000,
-    forks: 26800,
-    isPublic: true,
-  },
-  {
-    username: "tailwindlabs",
-    name: "tailwindcss",
-    description: "A utility-first CSS framework for rapid UI development",
-    language: "CSS",
-    stars: 82000,
-    forks: 4150,
-    isPublic: true,
-  },
-];
+import { Star, GitFork, Circle, Loader2 } from "lucide-react";
 
 const languageColors = {
   JavaScript: "#f1e05a",
@@ -51,81 +12,154 @@ const languageColors = {
 };
 
 export function Home() {
+  const [repos, setRepos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [starredIds, setStarredIds] = useState(new Set());
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // 1. Critical Fix: Ensure we are mounted to prevent Hydration errors
+  useEffect(() => {
+    setHasMounted(true);
+    
+    const fetchRepos = async () => {
+      try {
+        setIsLoading(true);
+        // Simulate a network delay
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        const mockData = [
+          { id: 1, username: "facebook", name: "react", description: "The library for web and native user interfaces", language: "JavaScript", stars: 228000, forks: 46700 },
+          { id: 2, username: "microsoft", name: "vscode", description: "Visual Studio Code", language: "TypeScript", stars: 163000, forks: 28900 },
+          { id: 3, username: "vercel", name: "next.js", description: "The React Framework", language: "JavaScript", stars: 125000, forks: 26800 },
+          { id: 4, username: "tailwindlabs", name: "tailwindcss", description: "Utility-first CSS framework", language: "CSS", stars: 82000, forks: 4150 },
+        ];
+
+        setRepos(mockData);
+      } catch (error) {
+        console.error("Failed to fetch repos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRepos();
+  }, []);
+
+  const toggleStar = (repoId) => {
+    setStarredIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(repoId)) {
+        newSet.delete(repoId);
+      } else {
+        newSet.add(repoId);
+      }
+      return newSet;
+    });
+  };
+
+  // Prevent rendering until the client is ready
+  if (!hasMounted) return null;
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center text-[#7d8590] bg-[#0d1117]">
+        <Loader2 className="animate-spin w-8 h-8" />
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="grid grid-cols-12 gap-6">
+    <div className="mx-auto max-w-7xl px-4 py-8 text-[#e6edf3]">
+      <div className="grid grid-cols-12 gap-8">
+        
         {/* Sidebar */}
-        <aside className="col-span-3">
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-sm font-semibold mb-2">Recent Repositories</h2>
-              <div className="space-y-2">
-                {repositories.slice(0, 3).map((repo) => (
-                  <Link
-                    key={`${repo.username}/${repo.name}`}
-                    href={`/${repo.username}/${repo.name}`}
-                    className="block text-sm text-[#539bf5] hover:underline"
-                  >
-                    {repo.username}/{repo.name}
-                  </Link>
-                ))}
-              </div>
+        <aside className="col-span-12 md:col-span-3">
+          <div className="sticky top-8">
+            <h2 className="text-sm font-semibold mb-4 flex items-center justify-between">
+              Recent Repositories
+              <span className="bg-[#21262d] text-xs px-2 py-0.5 rounded-full">{repos.length}</span>
+            </h2>
+            <div className="space-y-3">
+              {repos.map((repo) => (
+                <Link
+                  key={`side-${repo.id}`}
+                  href={`/${repo.username}/${repo.name}`}
+                  className="flex items-center gap-2 text-sm text-[#539bf5] hover:underline"
+                >
+                  <div className="w-3 h-3 rounded-full bg-[#30363d]" />
+                  <span className="truncate">{repo.username}/{repo.name}</span>
+                </Link>
+              ))}
             </div>
           </div>
         </aside>
 
         {/* Main Content */}
-        <div className="col-span-9">
-          <h1 className="text-2xl font-semibold mb-6">Trending Repositories</h1>
+        <div className="col-span-12 md:col-span-9">
+          <h1 className="text-xl font-semibold mb-6">Trending Repositories</h1>
 
           <div className="space-y-4">
-            {repositories.map((repo) => (
-              <div
-                key={`${repo.username}/${repo.name}`}
-                className="border border-[#30363d] rounded-md p-4 hover:border-[#3d444d] transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <Link
-                      href={`/${repo.username}/${repo.name}`}
-                      className="text-[#539bf5] hover:underline inline-flex items-center gap-2"
-                    >
-                      <span className="font-semibold">{repo.username}/{repo.name}</span>
-                      <span className="text-xs border border-[#30363d] rounded-full px-2 py-0.5 text-[#7d8590]">
-                        Public
-                      </span>
-                    </Link>
-                    <p className="text-sm text-[#7d8590] mt-2">{repo.description}</p>
+            {repos.map((repo) => {
+              const isStarred = starredIds.has(repo.id);
+              
+              return (
+                <div
+                  key={repo.id}
+                  className="border border-[#30363d] rounded-md p-5 bg-[#0d1117] hover:bg-[#161b22] transition-all"
+                >
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <Link
+                        href={`/${repo.username}/${repo.name}`}
+                        className="text-[#539bf5] hover:underline inline-flex items-center gap-2"
+                      >
+                        <span className="font-semibold text-lg">{repo.username}/{repo.name}</span>
+                        <span className="text-xs border border-[#30363d] rounded-full px-2 py-0.5 text-[#7d8590]">
+                          Public
+                        </span>
+                      </Link>
+                      
+                      <p className="text-sm text-[#7d8590] mt-2 leading-relaxed">
+                        {repo.description}
+                      </p>
 
-                    <div className="flex items-center gap-4 mt-3 text-xs text-[#7d8590]">
-                      {repo.language && (
+                      <div className="flex items-center gap-6 mt-4 text-xs text-[#7d8590]">
                         <div className="flex items-center gap-1.5">
                           <Circle
                             className="w-3 h-3"
                             fill={languageColors[repo.language] || "#7d8590"}
-                            color={languageColors[repo.language] || "#7d8590"}
+                            stroke="none"
                           />
                           <span>{repo.language}</span>
                         </div>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4" />
-                        <span>{repo.stars.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <GitFork className="w-4 h-4" />
-                        <span>{repo.forks.toLocaleString()}</span>
+                        
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4" />
+                          <span>{(repo.stars + (isStarred ? 1 : 0)).toLocaleString()}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                          <GitFork className="w-4 h-4" />
+                          <span>{repo.forks.toLocaleString()}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <button className="px-3 py-1 text-sm border border-[#30363d] rounded-md hover:border-[#3d444d] flex items-center gap-1">
-                    <Star className="w-4 h-4" />
-                    Star
-                  </button>
+                    <button
+                      onClick={() => toggleStar(repo.id)}
+                      className={`whitespace-nowrap px-4 py-1.5 text-sm border rounded-md flex items-center gap-2 transition-colors ${
+                        isStarred 
+                        ? "bg-[#21262d] border-[#7d8590]" 
+                        : "bg-[#21262d] border-[#30363d] hover:bg-[#30363d]"
+                      }`}
+                    >
+                      <Star className={`w-4 h-4 ${isStarred ? "fill-[#e3b341] text-[#e3b341]" : ""}`} />
+                      {isStarred ? "Starred" : "Star"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
