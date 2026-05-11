@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  reactStrictMode: false, // Prevents double-rendering (saves RAM)
+  experimental: {
+    webpackMemoryOptimizations: true,
+  },
 };
-
 export default nextConfig;
