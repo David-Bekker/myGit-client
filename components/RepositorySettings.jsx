@@ -1,17 +1,17 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link"; // Use next/link
-import { Link, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ChevronRight, AlertTriangle, Trash2 } from "lucide-react";
 
-export function RepositorySettings() {
+export default function RepositorySettings() {
   const { owner, repo } = useParams();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       {/* Breadcrumb */}
       <div className="mb-4 flex items-center gap-2 text-sm text-[#7d8590]">
-        <Link to={`/${owner}/${repo}`} className="text-[#539bf5] hover:underline">
+        <Link href={`/${owner}/${repo}`} className="text-[#539bf5] hover:underline">
           {owner}/{repo}
         </Link>
         <ChevronRight className="w-4 h-4" />

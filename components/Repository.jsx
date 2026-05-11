@@ -63,6 +63,14 @@ export default function Repository() {
               <AlertCircle className="w-4 h-4" /> Issues
               <span className="px-1.5 py-0.5 bg-[#21262d] rounded-full text-xs">{repoData.openIssues}</span>
             </Link>
+            <Link href={`/${username}/${repo}`} className="...">Code</Link>
+            <Link href={`/${username}/${repo}/pulls`} className="...">
+              Pull requests <span className="...">{repoData.pullRequests}</span>
+            </Link>
+            
+            <Link href={`/${username}/${repo}/settings`} className="...">
+              Settings
+            </Link>
           </nav>
         </div>
       </div>

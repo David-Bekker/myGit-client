@@ -36,7 +36,7 @@ const pullRequests = [
   },
 ];
 
-export function PullRequests() {
+export default function PullRequests() {
   const { owner, repo } = useParams();
 
   return (
@@ -90,7 +90,7 @@ export function PullRequests() {
                 <GitPullRequest className="w-4 h-4 text-[#3fb950] mt-1 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <Link
-                    to={`/${owner}/${repo}/pull/${pr.id}`}
+                    href={`/${owner}/${repo}/pull/${pr.id}`}
                     className="text-[#e6edf3] hover:text-[#539bf5] font-semibold"
                   >
                     {pr.title}
