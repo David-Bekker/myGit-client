@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -20,14 +21,12 @@ export default function RepositorySettings() {
   const { owner, repo } = useParams();
   const router = useRouter();
 
-  // --- States ---
   const [activeSection, setActiveSection] = useState("general");
   const [repoName, setRepoName] = useState(repo || "");
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   
-  // Feature Toggles State
   const [features, setFeatures] = useState({
     issues: true,
     wikis: true,
@@ -37,7 +36,6 @@ export default function RepositorySettings() {
     rebaseMerging: false,
   });
 
-  // Handle auto-clear success message
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(""), 3000);
@@ -45,24 +43,51 @@ export default function RepositorySettings() {
     }
   }, [successMessage]);
 
-  // --- Handlers ---
   const handleFeatureToggle = (feature) => {
     setFeatures(prev => ({ ...prev, [feature]: !prev[feature] }));
   };
 
+  // UPDATED: Now calls Spring Boot API
   const handleRename = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSuccessMessage("Repository renamed successfully!");
-    setIsSaving(false);
+    try {
+      const response = await fetch(`http://localhost:8080/api/repos/${owner}/${repo}/rename`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newName: repoName }),
+      });
+      
+      if (response.ok) {
+        setSuccessMessage("Repository renamed successfully!");
+      } else {
+        console.error("Rename failed on server");
+      }
+    } catch (error) {
+      console.error("Connection error:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
+  // UPDATED: Now calls Spring Boot API
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete ${owner}/${repo}? This cannot be undone.`)) {
       setIsDeleting(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      router.push(`/${owner}`);
+      try {
+        const response = await fetch(`http://localhost:8080/api/repos/${owner}/${repo}`, {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          router.push(`/${owner}`);
+        } else {
+          console.error("Delete failed on server");
+          setIsDeleting(false);
+        }
+      } catch (error) {
+        console.error("Connection error:", error);
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -76,7 +101,6 @@ export default function RepositorySettings() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 text-[#e6edf3] animate-in fade-in duration-500">
-      {/* Breadcrumb */}
       <div className="mb-4 flex items-center gap-2 text-sm text-[#7d8590]">
         <Link href={`/${owner}/${repo}`} className="text-[#539bf5] hover:underline">
           {owner}/{repo}
@@ -84,11 +108,8 @@ export default function RepositorySettings() {
         <ChevronRight className="w-4 h-4" />
         <span>Settings</span>
       </div>
-
       <h1 className="text-2xl font-semibold mb-6">Repository Settings</h1>
-
       <div className="grid grid-cols-12 gap-8">
-        {/* Sidebar Navigation */}
         <nav className="col-span-12 md:col-span-3 space-y-1">
           {navItems.map((item) => (
             <button
@@ -106,12 +127,9 @@ export default function RepositorySettings() {
           ))}
         </nav>
 
-        {/* Main Content Area */}
         <main className="col-span-12 md:col-span-9 space-y-6">
           {activeSection === "general" ? (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-              
-              {/* Repository Name Card */}
               <section className="border border-[#30363d] rounded-md p-6 bg-[#0d1117]">
                 <h2 className="text-lg font-semibold mb-2">Repository name</h2>
                 <p className="text-sm text-[#7d8590] mb-4">
@@ -140,7 +158,6 @@ export default function RepositorySettings() {
                 )}
               </section>
 
-              {/* Visibility Card */}
               <section className="border border-[#30363d] rounded-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -158,7 +175,6 @@ export default function RepositorySettings() {
                 </div>
               </section>
 
-              {/* Features Toggle Group */}
               <section className="border border-[#30363d] rounded-md overflow-hidden">
                 <div className="p-6 border-b border-[#30363d]">
                   <h2 className="text-lg font-semibold">Features</h2>
@@ -185,7 +201,6 @@ export default function RepositorySettings() {
                 </div>
               </section>
 
-              {/* Danger Zone */}
               <section className="border border-[#d73a49] rounded-md overflow-hidden mt-12 bg-[#161b22]/20">
                 <div className="p-4 bg-[#161b22]/40 border-b border-[#d73a49]">
                   <h2 className="font-semibold flex items-center gap-2 text-[#d73a49]">

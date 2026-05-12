@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -10,47 +11,43 @@ import {
 export default function Repository() {
   const params = useParams();
   const pathname = usePathname();
-  
-  // Extract parameters safely from dynamic routes /[username]/[repo]
+
   const username = params?.username || "loading";
   const repo = params?.repo || "repository";
-  
-  // UI State
+
   const [isBranchOpen, setIsBranchOpen] = useState(false);
   const [isCodeOpen, setIsCodeOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [currentBranch, setCurrentBranch] = useState("main");
   
-  // Data State
   const [data, setData] = useState({
     description: "",
     openIssues: 0,
     pullRequests: 0,
     files: [],
-    branches: ["main", "dev", "feature-ui", "fix-header"]
+    branches: ["main"]
   });
 
+  // UPDATED: Now fetches data from Spring Boot
   useEffect(() => {
-    // Simulate API fetch based on URL params
-    if (username && repo) {
-      setData(prev => ({
-        ...prev,
-        description: `Official repository for ${repo}. Built with modern web standards.`,
-        openIssues: 12,
-        pullRequests: 5,
-        files: [
-          { name: "src", type: "folder" },
-          { name: "public", type: "folder" },
-          { name: "package.json", type: "file" },
-          { name: "README.md", type: "file" },
-          { name: "tailwind.config.js", type: "file" },
-        ]
-      }));
-    }
+    const fetchRepoData = async () => {
+      if (username && repo) {
+        try {
+          const response = await fetch(`http://localhost:8080/api/repos/${username}/${repo}`);
+          if (response.ok) {
+            const result = await response.json();
+            setData(result);
+          }
+        } catch (error) {
+          console.error("Error fetching repository:", error);
+        }
+      }
+    };
+
+    fetchRepoData();
   }, [username, repo]);
 
   const repoUrl = `https://github.com/${username}/${repo}.git`;
-
   const handleCopy = () => {
     navigator.clipboard.writeText(repoUrl);
     setCopied(true);
@@ -64,7 +61,6 @@ export default function Repository() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 text-[#e6edf3]">
-      {/* Breadcrumbs Header */}
       <div className="mb-6">
         <h1 className="flex items-center gap-2 text-xl">
           <Link href={`/${username}`} className="text-[#539bf5] hover:underline">
@@ -80,7 +76,6 @@ export default function Repository() {
         </h1>
         <p className="text-sm text-[#7d8590] mt-2">{data.description}</p>
         
-        {/* Navigation Tabs */}
         <nav className="flex gap-1 text-sm border-b border-[#30363d] mt-4">
           {[
             { label: "Code", icon: Code, path: "" },
@@ -109,9 +104,7 @@ export default function Repository() {
         </nav>
       </div>
 
-      {/* Action Bar */}
       <div className="flex justify-between items-center mb-4">
-        {/* Branch Selector */}
         <div className="relative">
           <button 
             onClick={() => setIsBranchOpen(!isBranchOpen)}
@@ -121,7 +114,6 @@ export default function Repository() {
             {currentBranch} 
             <ChevronDown className={`w-3 h-3 transition-transform ${isBranchOpen ? 'rotate-180' : ''}`} />
           </button>
-
           {isBranchOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setIsBranchOpen(false)} />
@@ -154,77 +146,15 @@ export default function Repository() {
           )}
         </div>
 
-        {/* Code Download Selector */}
         <div className="relative">
           <button 
             onClick={() => setIsCodeOpen(!isCodeOpen)}
             className="flex items-center gap-2 px-3 py-1.5 bg-[#238636] hover:bg-[#2ea043] rounded-md text-sm font-semibold text-white transition-colors"
           >
-            <Download className="w-4 h-4" /> 
-            Code 
+            <Download className="w-4 h-4" />
+            Code
             <ChevronDown className={`w-3 h-3 transition-transform ${isCodeOpen ? 'rotate-180' : ''}`} />
           </button>
-
-          {isCodeOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setIsCodeOpen(false)} />
-              <div className="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl z-20 p-4">
-                <div className="flex items-center gap-2 mb-3 text-sm font-bold">
-                  <Terminal className="w-4 h-4 text-[#7d8590]"/> Clone
-                </div>
-                <div className="flex items-center gap-2 bg-[#0d1117] border border-[#30363d] rounded-md p-1.5">
-                  <input 
-                    readOnly 
-                    value={repoUrl} 
-                    className="bg-transparent text-xs flex-1 outline-none px-2 text-[#7d8590]" 
-                  />
-                  <button 
-                    onClick={handleCopy} 
-                    className="p-1.5 hover:bg-[#30363d] rounded-md transition-colors"
-                    title="Copy to clipboard"
-                  >
-                    {copied ? <Check className="w-4 h-4 text-[#3fb950]" /> : <Copy className="w-4 h-4 text-[#7d8590]" />}
-                  </button>
-                </div>
-                <div className="mt-4 pt-3 border-t border-[#30363d]">
-                  <button className="flex items-center gap-2 w-full text-left px-2 py-2 text-sm text-[#e6edf3] hover:bg-[#1f6feb] rounded-md transition-colors">
-                    <Download className="w-4 h-4" /> Download ZIP
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* File Browser List */}
-      <div className="border border-[#30363d] rounded-md bg-[#0d1117] overflow-hidden">
-        <div className="bg-[#161b22] px-4 py-3 border-b border-[#30363d] text-sm flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500" />
-            <span className="font-semibold hover:text-[#539bf5] cursor-pointer transition-colors">{username}</span>
-            <span className="text-[#7d8590]">Update structure for {currentBranch}</span>
-          </div>
-          <span className="text-[#7d8590]">2 hours ago</span>
-        </div>
-        
-        <div className="flex flex-col">
-          {data.files.map((file) => (
-            <Link
-              key={file.name}
-              href={`/${username}/${repo}/blob/${currentBranch}/${file.name}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-[#161b22] border-b border-[#30363d] last:border-0 group"
-            >
-              {file.type === "folder" ? (
-                <Folder className="w-4 h-4 text-[#7d8590] fill-[#7d8590]" />
-              ) : (
-                <FileText className="w-4 h-4 text-[#7d8590]" />
-              )}
-              <span className="text-sm text-[#e6edf3] group-hover:text-[#539bf5] group-hover:underline transition-colors">
-                {file.name}
-              </span>
-            </Link>
-          ))}
         </div>
       </div>
     </div>
