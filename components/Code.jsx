@@ -7,6 +7,7 @@ import { ChevronRight, Copy, Check, FileText } from "lucide-react";
 export default function CodeViewer() {
   const params = useParams();
   const [copied, setCopied] = useState(false);
+  const [viewMode, setViewMode] = useState("code");
 
   // 1. Dynamic Route Extraction
 // 1. Dynamic Route Extraction
@@ -73,10 +74,18 @@ export default function CodeViewer() {
           
           <div className="flex items-center gap-2">
             <div className="flex border border-[#30363d] rounded-md overflow-hidden">
-              <button className="px-3 py-1 text-xs font-medium bg-[#21262d] text-[#e6edf3] border-r border-[#30363d] hover:bg-[#30363d] transition-colors">
+              <button onClick={() => setViewMode("preview")} className={`px-3 py-1 text-xs font-medium border-r border-[#30363d] transition-colors ${
+                viewMode === "preview"
+                  ? "bg-[#21262d] text-[#e6edf3]"
+                  : "text-[#7d8590] hover:bg-[#30363d]"
+              }`}>
                 Preview
               </button>
-              <button className="px-3 py-1 text-xs font-medium text-[#7d8590] hover:bg-[#30363d] transition-colors">
+              <button onClick={() => setViewMode("code")} className={`px-3 py-1 text-xs font-medium transition-colors ${
+                viewMode === "code"
+                  ? "bg-[#21262d] text-[#e6edf3]"
+                  : "text-[#7d8590] hover:bg-[#30363d]"
+              }`}>
                 Code
               </button>
             </div>

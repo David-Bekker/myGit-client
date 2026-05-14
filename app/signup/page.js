@@ -36,6 +36,25 @@ export default function SignUpPage() {
     }
   };
 
+  const handleGuestLogin = async () => {
+    setIsLoading(true);
+    try {
+        const response = await fetch("http://localhost:8080/api/auth/guest", {
+        method: "POST",
+        });
+        if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
+        router.push("/");
+        }
+    } catch (err) {
+        setError("Guest login failed.");
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0d1117] flex flex-col items-center justify-center px-4 py-12">
       <GitBranchIcon className="w-12 h-12 text-[#f0f6fc] mb-6" />
@@ -88,6 +107,13 @@ export default function SignUpPage() {
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Create account
+          </button>
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            className="w-full mt-2 bg-transparent border border-[#30363d] text-[#f0f6fc] hover:bg-[#30363d] font-semibold py-1.5 rounded-md text-sm transition-colors"
+          >
+            Sign in as Guest
           </button>
         </form>
 

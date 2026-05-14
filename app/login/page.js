@@ -27,6 +27,7 @@ export default function LoginPage() {
         const data = await response.json();
         // Store token in localStorage or a cookie
         localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
         router.push("/"); // Redirect to home/dashboard
       } else {
         setError("Invalid email or password. Please try again.");
